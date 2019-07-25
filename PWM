@@ -1,0 +1,59 @@
+*
+ * Current_meas.c
+ *
+ * Created: 22/07/2019 13:25:44
+ * Author : FRA
+ */ 
+
+#include <avr/io.h>
+/*Using default clock 3.33MHz */
+
+void TCA0_init(void); /*16-bit PWM Timer/Counter type A*/
+void PORT_init(void);
+
+void TCA0_init(void)
+{
+	TCA0.SINGLE.CTRLB = TCA_SINGLE_CMP1EN_bm /* enable compare channel 1 . Match between the counter value and the Compare 1
+	register.*/
+	| TCA_SINGLE_CMP2EN_bm /* enable compare channel 1 */
+	| TCA_SINGLE_WGMODE_DSBOTTOM_gc; /* set dual-slope PWM mode */
+
+	/* disable event counting */
+	TCA0.SINGLE.EVCTRL &= ~(TCA_SINGLE_CNTEI_bm);
+
+	/* set PWM frequency and duty cycle (50%) */
+	TCA0.SINGLE.PERBUF = 10; /*buffer of the Period register*/
+	TCA0.SINGLE.CMP1BUF = (TCA0.SINGLE.PERBUF>>1) - 1;
+	TCA0.SINGLE.CMP2BUF = (TCA0.SINGLE.PERBUF>>1) + 1;
+	
+	TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc /* set clock source (sys_clk/4) */
+	| TCA_SINGLE_ENABLE_bm; /* start timer */
+}
+void PORT_init(void)
+{
+	/* set pin 0 of PORT A as output */
+	PORTA.DIR |= PIN1_bm | PIN2_bm;
+	PORTA.PIN2CTRL |= PORT_INVEN_bm;
+}
+
+/* Replace with your application code */
+int main(void)
+{
+	/*setting clock*/
+	CPU_CCP = 0xD8; // CCP: Configuration Change Protection
+	//CLKCTRL.MCLKCTRLA = CLKCTRL_CLKSEL_OSC20M_gc; // internal Clock
+	CLKCTRL.MCLKCTRLA = CLKCTRL_CLKSEL_EXTCLK_gc;  //External Clock
+	CPU_CCP = 0xD8;
+	CLKCTRL.MCLKCTRLB = CLKCTRL_PDIV_2X_gc | CLKCTRL_PEN_bm;
+	/*END setting clock*/
+	TCA0_init();
+
+	PORT_init();
+	
+	
+	while (1)
+	{
+		;
+	}
+}
+
