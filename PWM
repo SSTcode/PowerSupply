@@ -13,9 +13,8 @@ void PORT_init(void);
 
 void TCA0_init(void)
 {
-	TCA0.SINGLE.CTRLB = TCA_SINGLE_CMP1EN_bm /* enable compare channel 1 . Match between the counter value and the Compare 1
-	register.*/
-	| TCA_SINGLE_CMP2EN_bm /* enable compare channel 1 */
+	TCA0.SINGLE.CTRLB = TCA_SINGLE_CMP2EN_bm /* enable compare channel W02 */
+	| TCA_SINGLE_CMP0EN_bm /* enable compare channel WO0 */
 	| TCA_SINGLE_WGMODE_DSBOTTOM_gc; /* set dual-slope PWM mode */
 
 	/* disable event counting */
